@@ -1,0 +1,29 @@
+{
+    "name": "nexus",
+    "version": "1.0.0",
+    "description": "MiniPay cUSD Transfer using SocialConnect",
+    "private": true,
+    "author": "Celo",
+    "license": "MIT",
+    "scripts": {
+        "react-app:dev": "yarn workspace @nexus/react-app dev",
+        "react-app:build": "yarn workspace @nexus/react-app build",
+        "react-app:start": "yarn workspace @nexus/react-app start",
+        "react-app:lint": "yarn workspace @nexus/react-app lint"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/celo-org/celo-composer.git"
+    },
+    "bugs": {
+        "url": "https://github.com/celo-org/celo-composer/issues"
+    },
+    "homepage": "https://github.com/celo-org/celo-composer/blob/main/README.md",
+    "workspaces": [
+        "packages/*"
+    ],
+    "keywords": [
+        "celo-composer",
+        "celo"
+    ]
+}
