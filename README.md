@@ -1,26 +1,7 @@
 <!-- TITLE -->
 <p align="center"> 
   <img width="100px" src="https://github.com/celo-org/celo-composer/blob/main/images/readme/celo_isotype.svg" align="center" alt="Celo" />
- <h2 align="center">Celo Composer</h2>
- <p align="center">Build, deploy, and iterate quickly on decentralized applications using Celo.</p>
-</p>
-  <p align="center">
-    <a href="https://github.com/celo-org/celo-composer/graphs/stars">
-      <img alt="GitHub Contributors" src="https://img.shields.io/github/stars/celo-org/celo-composer?color=FCFF52" />
-    </a>
-    <a href="https://github.com/celo-org/celo-composer/graphs/contributors">
-      <img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/celo-org/celo-composer?color=E7E3D4" />
-    </a>
-    <a href="https://github.com/celo-org/celo-composer/issues">
-      <img alt="Issues" src="https://img.shields.io/github/issues/celo-org/celo-composer?color=E7E3D4" />
-    </a>
-    <a href="https://github.com/celo-org/celo-composer/pulls">
-      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/celo-org/celo-composer?color=E7E3D4" />
-    </a>
-    <a href="https://opensource.org/license/mit/">
-      <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-    </a>
-  </p>
+ <h1 align="center">Nexus</h1>
 </p>
 
 <!-- TABLE OF CONTENTS -->
@@ -53,23 +34,17 @@
 
 ## About The Project
 
-Celo Composer allows you to quickly build, deploy, and iterate on decentralized applications using Celo. It provides a number of frameworks, examples, and Celo specific functionality to help you get started with your next dApp.
+Nexus allows you to quickly build, deploy, and iterate on SocialConnect inside MiniPay.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Built With
 
-Celo Composer is built on Celo to make it simple to build dApps using a variety of front-end frameworks, and libraries.
+Nexus is built on Celo to make it simple to build dApps using a variety of front-end frameworks, and libraries.
 
-- [Celo](https://celo.org/)
-- [Solidity](https://docs.soliditylang.org/en/v0.8.19/)
-- [Next.js](https://nextjs.org/)
-- [React.js](https://reactjs.org/)
-- [Material UI](https://mui.com/)
-- [React Native](https://reactnative.dev/)
-- [Flutter](https://docs.flutter.dev/)
-- [React-celo](https://github.com/celo-org/react-celo/)
-- [Rainbowkit-celo](https://github.com/celo-org/rainbowkit-celo)
+-   [Celo](https://celo.org/)
+-   [SocialConnect](https://github.com/celo-org/social-connect/tree/main)
+-   [Next.js](https://nextjs.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -77,121 +52,101 @@ Celo Composer is built on Celo to make it simple to build dApps using a variety 
 
 ## Prerequisites
 
-- Node
-- Git (v2.38 or higher)
+-   Node (v18)
 
-## How to use Celo Composer
+## How to use Nexus
 
-The easiest way to start with Celo Composer is using `@celo/celo-composer`. This CLI tool lets you quickly start building dApps on Celo for multiple frameworks, including React (with either react-celo or rainbowkit-celo), React Native (w/o Expo), Flutter, and Angular. To get started, just run the following command, and follow the steps:
+### Clone the repo
 
 ```bash
-npx @celo/celo-composer@latest create
+git clone https://github.com/celo-org/nexus.git
 ```
 
-### Front-end framework
+### Install the packages
 
-![Celo Composer select framework](https://github.com/celo-org/celo-composer/blob/main/images/readme/cc_step_1.png?raw=true)
+```bash
+yarn
+```
 
-### Web3 library (for react-app)
+### Setup Environment Variables
 
-![Celo Composer select framework](https://github.com/celo-org/celo-composer/blob/main/images/readme/cc_step_2.png?raw=true)
+All the following variables go in the `/packages/react-app/.env.local` file (you can create a copy from `.env.local.example`)
 
-### Smart contract framework
+#### Get WalletConnect Project ID
 
-![Celo Composer tool selection](https://github.com/celo-org/celo-composer/blob/main/images/readme/cc_step_3.png?raw=true)
+Sign up for WalletConnect and get the project id.
 
-### Subgraph
+![WalletConnect Project id](./packages/react-app/public/projectid.png)
 
-![Celo Composer subgraph support](https://github.com/celo-org/celo-composer/blob/main/images/readme/cc_step_4.png?raw=true)
+#### Setup Issuer and Issuer DEK
 
-### Name your dApp
+The steps to setup issuer and issuer DEK are [here](https://github.com/celo-org/social-connect/blob/main/docs/key-setup.md).
 
-![Celo Composer dApp name](https://github.com/celo-org/celo-composer/blob/main/images/readme/cc_step_5.png?raw=true)
+#### Environment
 
-**_🔥Voila, you have a dApp ready to go. Voila, you have a dApp ready to go. Start building your dApp on Celo._**
+You can use either `MAINNET` or `TESTNET` as the values for `NEXT_PUBLIC_ENVIRONMENT`, depending on which the RPC and Contract Addresses change.
 
-### Getting started
+### Run the project
 
-Once your custom dApp has been created, just install dependencies, either with `yarn` or `npm i`, and run the respective script from the `package.json` file.
-## Supported Frameworks
+You can use the following command to run the project locally.
 
-### React
+```bash
+yarn dev
+```
 
-- Support for Website and Progressive Web Application.
-- Works with all major crypto wallets.
+This will start the app at `http://localhost:3000`.
 
-Check [package readme](https://github.com/celo-org/celo-composer/blob/main/packages/react-app/README.md) to learn more about.
+Since, this app is running on localhost and cannot be opened in MiniPay we need to create a tunnel we will use [ngrok](https://ngrok.com/) for the same.
 
-### React Native
+1. Create an account on ngrok, setup ngrok on your machine.
 
-- Out of the box config, just focus on buidl.
-- Support for Android and IOS.
-- Works with and without [Expo](https://expo.dev/).
-- Working example app included.
+    > [!NOTE]
+    > ngrok is offering free static domain, use that so the url of the app does not change!
 
-Check [package readme](https://github.com/celo-org/celo-composer/blob/main/packages/react-native-app/README.md) to learn more about.
+2. Use the following command, to start the tunnel.
 
-### Flutter
+    If you have the static domain
 
-- One command to get started - Type `flutter run` to start development in your mobile phone.
-- Works with all major mobile crypto wallets.
-- Support for Android, IOS (Web, Windows, and Linux coming soon).
-- Working example app included.
+    ```bash
+    ngrok http --domain=<STATIC_DOMAIN> 3000
+    ```
 
-Check [package readme](https://github.com/celo-org/celo-composer/blob/main/packages/flutter-app/README.md) to learn more about.
+    If not
 
-### Angular
+    ```bash
+    ngrok http 3000
+    ```
 
-- Support for Website and Progressive Web Application.
-- Works with all major crypto wallets.
+### How to test your DApp in MiniPay
 
-Check [package readme](https://github.com/celo-org/celo-composer/blob/main/packages/angular-app/README.md) to learn more about.
+1. Open the MiniPay app on your phone and click on compass icon.
 
-<!-- USAGE EXAMPLES -->
+    ![minipay-app](https://github.com/celo-org/docs/blob/0712d6ec3231bd7d64a906d610a16deb1e6b037e/static/img/doc-images/minipay/minipay-1.png?raw=true)
 
-## 🔭 Learning Solidity
+2. Click on "Test Page" to open the MiniPay test page.
 
-📕 Read the docs: <https://docs.soliditylang.org>
+    ![minipay-apps-screen](https://github.com/celo-org/docs/blob/0712d6ec3231bd7d64a906d610a16deb1e6b037e/static/img/doc-images/minipay/minipay-2.png?raw=true)
 
-- [Primitive Data Types](https://solidity-by-example.org/primitives/)
-- [Mappings](https://solidity-by-example.org/mapping/)
-- [Structs](https://solidity-by-example.org/structs/)
-- [Modifiers](https://solidity-by-example.org/function-modifier/)
-- [Events](https://solidity-by-example.org/events/)
-- [Inheritance](https://solidity-by-example.org/inheritance/)
-- [Payable](https://solidity-by-example.org/payable/)
-- [Fallback](https://solidity-by-example.org/fallback/)
+3. Enter the URL of your DApp and click on "Go".
 
-📧 Learn the [Solidity globals and units](https://solidity.readthedocs.io/en/v0.8.19/units-and-global-variables.html)
+    ![minipay-site-tester](https://github.com/celo-org/docs/blob/0712d6ec3231bd7d64a906d610a16deb1e6b037e/static/img/doc-images/minipay/minipay-3.png?raw=true)
 
 ## Support
 
-Join the Celo Discord server at <https://chat.celo.org>. Reach out on the dedicated repo channel [here](https://discord.com/channels/600834479145353243/941003424298856448).
-
-<!-- ROADMAP -->
-
-## Roadmap
-
-See the [open issues](https://github.com/celo-org/celo-composer/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+Team at Celo keeps a constant eye on issues, so please open an issue [here](https://github.com/celo-org/nexus/issues) and also feel free to introduce yourself, share progress and engage with other MiniPay partners and the Celo team here in [discussions](https://github.com/celo-org/nexus/discussions).
 
 <!-- CONTRIBUTING -->
-
-## Contributing
-
-We welcome contributions from the community.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <!-- CONTACT -->
+
 ## Contact
 
-- [@CeloDevs](https://twitter.com/CeloDevs)
-- [Discord](https://discord.com/invite/celo)
+-   [@CeloDevs](https://twitter.com/CeloDevs)
+-   [Discord](https://discord.com/invite/celo)
+-   [Email](devrel@celo.org)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
