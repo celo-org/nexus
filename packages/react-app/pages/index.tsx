@@ -96,7 +96,7 @@ export default function Home() {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center gap-y-4">
+        <div className="w-screen flex flex-col justify-center items-center gap-y-4">
             <p className="text-xl">Send cUSD to external users</p>
             <input
                 className="text-[48px] bg-gypsum outline-none text-center"
