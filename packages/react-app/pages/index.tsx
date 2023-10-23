@@ -28,7 +28,7 @@ export default function Home() {
 
         let lookupResponse: LookupResponse = await response.json();
 
-        if (lookupResponse.error) {
+        if ("error" in lookupResponse) {
             toast.error(lookupResponse.error, { duration: 2000 });
             console.error(lookupResponse.error);
         } else {
@@ -43,9 +43,11 @@ export default function Home() {
                 })) as string[][];
 
                 setResolvedReceiverAddress(resolvedAddress[1][0]);
-            } catch (error) {
-                toast.error(error.message, { duration: 2000 });
-                console.error(error.message);
+            } catch (error: any) {
+                if ("message" in error) {
+                    toast.error(error.message, { duration: 2000 });
+                    console.error(error.message);
+                }
             }
         }
     }
@@ -58,10 +60,13 @@ export default function Home() {
                 data: encodeFunctionData({
                     abi: stableTokenAbi,
                     functionName: "transfer",
-                    args: [resolvedReceiverAddress, parseEther(transferValue)],
+                    args: [
+                        resolvedReceiverAddress,
+                        parseEther(`${Number(transferValue)}`),
+                    ],
                 }),
             });
-        } catch (error) {
+        } catch (error: any) {
             toast.error(error.message, { duration: 2000 });
         }
     }
@@ -83,7 +88,7 @@ export default function Home() {
                     toast.error("Something went wrong!");
                     console.error(registerResponse.error);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 toast.error(error.message);
                 console.error(error.message);
             }
