@@ -71,29 +71,29 @@ export default function Home() {
         }
     }
 
-    async function register() {
-        if (walletClient) {
-            try {
-                let response = await fetch("/api/socialconnect/register", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        account: walletClient?.account.address,
-                        identifier,
-                    }),
-                });
+    // async function register() {
+    //     if (walletClient) {
+    //         try {
+    //             let response = await fetch("/api/socialconnect/register", {
+    //                 method: "POST",
+    //                 body: JSON.stringify({
+    //                     account: walletClient?.account.address,
+    //                     identifier,
+    //                 }),
+    //             });
 
-                let registerResponse = await response.json();
+    //             let registerResponse = await response.json();
 
-                if (registerResponse.error) {
-                    toast.error("Something went wrong!");
-                    console.error(registerResponse.error);
-                }
-            } catch (error: any) {
-                toast.error(error.message);
-                console.error(error.message);
-            }
-        }
-    }
+    //             if (registerResponse.error) {
+    //                 toast.error("Something went wrong!");
+    //                 console.error(registerResponse.error);
+    //             }
+    //         } catch (error: any) {
+    //             toast.error(error.message);
+    //             console.error(error.message);
+    //         }
+    //     }
+    // }
 
     return (
         <div className="w-screen flex flex-col justify-center items-center gap-y-4">
@@ -132,12 +132,12 @@ export default function Home() {
                     >
                         Send
                     </button>
-                    <button
+                    {/* <button
                         onClick={register}
                         className="rounded-md border border-black bg-prosperity px-3 py-1 text-base font-medium text-black shadow-sm"
                     >
                         Register
-                    </button>
+                    </button> */}
                 </>
             )}
         </div>
