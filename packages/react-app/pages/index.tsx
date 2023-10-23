@@ -6,6 +6,7 @@ import stableTokenAbi from "../abi/StableToken";
 import toast from "react-hot-toast";
 import type { LookupResponse } from "./api/socialconnect/lookup";
 import { FA_PROXY_ADDRESS, STABLE_TOKEN_ADDRESS } from "@/utils/constants";
+import { celo, celoAlfajores } from "viem/chains";
 
 const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
 
@@ -66,6 +67,10 @@ export default function Home() {
                         parseEther(`${Number(transferValue)}`),
                     ],
                 }),
+                chain:
+                    process.env.NEXT_PUBLIC_ENVIRONMENT == "TESTNET"
+                        ? celoAlfajores
+                        : celo,
             });
         } catch (error: any) {
             toast.error(error.message, { duration: 2000 });
