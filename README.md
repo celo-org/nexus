@@ -40,7 +40,7 @@ Nexus allows you to quickly build, deploy, and iterate on SocialConnect inside M
 
 ## Built With
 
-Nexus is built on Celo to make it simple to build dApps using a variety of front-end frameworks, and libraries.
+Nexus is built on Celo to make it simple to test SocialConnect features inside MiniPay site tester.
 
 -   [Celo](https://celo.org/)
 -   [SocialConnect](https://github.com/celo-org/social-connect/tree/main)
