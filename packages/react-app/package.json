@@ -9,7 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@celo/identity": "^5.0.4",
+        "@celo/identity": "^5.1.1",
         "@celo/rainbowkit-celo": "^1.0.1",
         "@headlessui/react": "^1.7.14",
         "@heroicons/react": "^2.0.18",

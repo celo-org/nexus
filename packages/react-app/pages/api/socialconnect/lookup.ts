@@ -64,7 +64,9 @@ export default async function lookup(
                  * In this example, we are looking up addresses under our own issuer.
                  * But SocialConnect allows looking up under other issuers just need their address.
                  */
-                let issuerAddresses = [wallet.address];
+                let issuerAddresses = [
+                    "0x7888612486844Bb9BE598668081c59A9f7367FBc",
+                ];
 
                 let lookupResponse: LookupResponse = await issuer.lookup(
                     identifier,
@@ -74,6 +76,7 @@ export default async function lookup(
 
                 return res.status(200).json(lookupResponse);
             } catch (error) {
+                console.log(error);
                 return res.status(500).json({
                     error: "Something went wrong",
                 });

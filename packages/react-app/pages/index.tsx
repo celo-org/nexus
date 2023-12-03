@@ -8,7 +8,8 @@ import type { LookupResponse } from "./api/socialconnect/lookup";
 import { FA_PROXY_ADDRESS, STABLE_TOKEN_ADDRESS } from "@/utils/constants";
 import { celo, celoAlfajores } from "viem/chains";
 
-const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
+// const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
+const ISSUER_ADDRESS = "0x7888612486844Bb9BE598668081c59A9f7367FBc";
 
 export default function Home() {
     const publicClient = usePublicClient();
@@ -44,6 +45,7 @@ export default function Home() {
                     args: [obfuscatedId, [ISSUER_ADDRESS]],
                 })) as string[][];
 
+                console.log(resolvedAddress[1]);
                 setResolvedReceiverAddress(resolvedAddress[1][0]);
             } catch (error: any) {
                 if ("message" in error) {
@@ -73,7 +75,7 @@ export default function Home() {
                         : celo,
             });
         } catch (error: any) {
-            toast.error(error.message, { duration: 2000 });
+            toast.error("Something went wrong", { duration: 2000 });
         }
     }
 
