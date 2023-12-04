@@ -105,21 +105,23 @@ export default function Home() {
                     duration: 6000,
                 }
             );
+            if (hash) {
+                const transaction =
+                    await publicClient.waitForTransactionReceipt({
+                        hash,
+                    });
 
-            const transaction = await publicClient.waitForTransactionReceipt({
-                hash,
-            });
-
-            if (transaction.status === "success") {
-                toast.success("Transaction successful", {
-                    id: txToast,
-                    duration: 2000,
-                });
-            } else {
-                toast.error("Something went wrong", {
-                    id: txToast,
-                    duration: 2000,
-                });
+                if (transaction.status === "success") {
+                    toast.success("Transaction successful", {
+                        id: txToast,
+                        duration: 2000,
+                    });
+                } else {
+                    toast.error("Something went wrong", {
+                        id: txToast,
+                        duration: 2000,
+                    });
+                }
             }
         } catch (error: any) {
             toast.error("Something went wrong", { duration: 2000 });
