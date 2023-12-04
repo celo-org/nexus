@@ -128,7 +128,7 @@ export default function Home() {
         }
     }
 
-    async function handleIdentifierChange({ target }) {
+    async function handleIdentifierChange({ target }: any) {
         if (isAddress(target.value)) {
             setResolvedReceiverAddress(target.value);
             setIdentifier(target.value);
