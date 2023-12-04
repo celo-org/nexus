@@ -59,7 +59,7 @@ export default function Home() {
     async function sendCUSD() {
         // Refactor for window.ethereum can't use walletClient
         try {
-            await walletClient?.sendTransaction({
+            let hash = await walletClient?.sendTransaction({
                 to: STABLE_TOKEN_ADDRESS,
                 data: encodeFunctionData({
                     abi: stableTokenAbi,
@@ -74,6 +74,8 @@ export default function Home() {
                         ? celoAlfajores
                         : celo,
             });
+
+            toast.success(hash as string);
         } catch (error: any) {
             toast.error("Something went wrong", { duration: 2000 });
         }
