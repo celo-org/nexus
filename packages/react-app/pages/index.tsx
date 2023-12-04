@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { encodeFunctionData, parseEther, toHex } from "viem";
+import { encodeFunctionData, isAddress, parseEther, toHex } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import FederatedAttestationsAbi from "../abi/FederatedAttestation";
 import stableTokenAbi from "../abi/StableToken";
@@ -7,18 +7,29 @@ import toast from "react-hot-toast";
 import type { LookupResponse } from "./api/socialconnect/lookup";
 import { FA_PROXY_ADDRESS, STABLE_TOKEN_ADDRESS } from "@/utils/constants";
 import { celo, celoAlfajores } from "viem/chains";
+import Button from "@/components/Button";
 
-const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
+// const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
+const ISSUER_ADDRESS = "0x7888612486844Bb9BE598668081c59A9f7367FBc";
 
 export default function Home() {
     const publicClient = usePublicClient();
     const { isConnected } = useAccount();
     const { data: walletClient } = useWalletClient();
+
+    const [resolvingAddress, setResolvingAddress] = useState(false);
     const [resolvedReceiverAddress, setResolvedReceiverAddress] = useState("");
     const [identifier, setIdentifier] = useState("");
+
     const [transferValue, setTransferValue] = useState("");
 
     async function lookupAddress() {
+        setResolvingAddress(true);
+
+        let resolvingToast = toast.loading("Looking up address", {
+            duration: 6000,
+        });
+
         let response: Response = await fetch(
             `/api/socialconnect/lookup?${new URLSearchParams({
                 handle: identifier,
@@ -31,7 +42,11 @@ export default function Home() {
         let lookupResponse: LookupResponse = await response.json();
 
         if ("error" in lookupResponse) {
-            toast.error(lookupResponse.error, { duration: 2000 });
+            toast.error(lookupResponse.error, {
+                id: resolvingToast,
+                duration: 2000,
+            });
+
             console.error(lookupResponse.error);
         } else {
             let { obfuscatedId } = lookupResponse;
@@ -44,12 +59,23 @@ export default function Home() {
                     args: [obfuscatedId, [ISSUER_ADDRESS]],
                 })) as string[][];
 
+                if (resolvedAddress[1].length) {
+                    toast.success("Address found", { id: resolvingToast });
+                } else {
+                    toast.error("No address found", { id: resolvingToast });
+                }
+
                 setResolvedReceiverAddress(resolvedAddress[1][0]);
             } catch (error: any) {
                 if ("message" in error) {
-                    toast.error(error.message, { duration: 2000 });
+                    toast.error(error.message, {
+                        id: resolvingToast,
+                        duration: 2000,
+                    });
                     console.error(error.message);
                 }
+            } finally {
+                setResolvingAddress(false);
             }
         }
     }
@@ -57,7 +83,7 @@ export default function Home() {
     async function sendCUSD() {
         // Refactor for window.ethereum can't use walletClient
         try {
-            await walletClient?.sendTransaction({
+            let hash = await walletClient?.sendTransaction({
                 to: STABLE_TOKEN_ADDRESS,
                 data: encodeFunctionData({
                     abi: stableTokenAbi,
@@ -72,34 +98,44 @@ export default function Home() {
                         ? celoAlfajores
                         : celo,
             });
+
+            let txToast = toast.loading(
+                "Transaction sent waiting for confirmation",
+                {
+                    duration: 6000,
+                }
+            );
+            if (hash) {
+                const transaction =
+                    await publicClient.waitForTransactionReceipt({
+                        hash,
+                    });
+
+                if (transaction.status === "success") {
+                    toast.success("Transaction successful", {
+                        id: txToast,
+                        duration: 2000,
+                    });
+                } else {
+                    toast.error("Something went wrong", {
+                        id: txToast,
+                        duration: 2000,
+                    });
+                }
+            }
         } catch (error: any) {
-            toast.error(error.message, { duration: 2000 });
+            toast.error("Something went wrong", { duration: 2000 });
         }
     }
 
-    // async function register() {
-    //     if (walletClient) {
-    //         try {
-    //             let response = await fetch("/api/socialconnect/register", {
-    //                 method: "POST",
-    //                 body: JSON.stringify({
-    //                     account: walletClient?.account.address,
-    //                     identifier,
-    //                 }),
-    //             });
-
-    //             let registerResponse = await response.json();
-
-    //             if (registerResponse.error) {
-    //                 toast.error("Something went wrong!");
-    //                 console.error(registerResponse.error);
-    //             }
-    //         } catch (error: any) {
-    //             toast.error(error.message);
-    //             console.error(error.message);
-    //         }
-    //     }
-    // }
+    async function handleIdentifierChange({ target }: any) {
+        if (isAddress(target.value)) {
+            setResolvedReceiverAddress(target.value);
+            setIdentifier(target.value);
+        } else {
+            setIdentifier(target.value);
+        }
+    }
 
     return (
         <div className="w-screen flex flex-col justify-center items-center gap-y-4">
@@ -120,38 +156,29 @@ export default function Home() {
                         <span>To:</span>
                         <input
                             value={identifier}
-                            onChange={({ target }) =>
-                                setIdentifier(target.value)
-                            }
+                            onChange={(e) => handleIdentifierChange(e)}
                             className="text-[16px] w-[250px] bg-gypsum border-b-2 outline-none"
                         />
                     </div>
-                    {resolvedReceiverAddress ? (
-                        <div className="flex text-center flex-col gap-y-4 items-center">
-                            <p>Resolved Address: {resolvedReceiverAddress}</p>
-                            <button
-                                onClick={sendCUSD}
-                                className="rounded-md border border-black bg-prosperity px-3 py-1 text-base font-medium text-black shadow-sm"
-                            >
-                                Confirm
-                            </button>
-                        </div>
-                    ) : (
-                        <>
-                            <button
+                    <div className="flex text-center flex-col gap-y-4 items-center">
+                        <p>Resolved Address: {resolvedReceiverAddress}</p>
+                        <div className="flex gap-x-2">
+                            <Button
                                 onClick={lookupAddress}
-                                className="rounded-md border border-black bg-prosperity px-3 py-1 text-base font-medium text-black shadow-sm"
-                            >
-                                Send
-                            </button>
-                            {/* <button
-                            onClick={register}
-                            className="rounded-md border border-black bg-prosperity px-3 py-1 text-base font-medium text-black shadow-sm"
-                        >
-                            Register
-                        </button> */}
-                        </>
-                    )}
+                                disabled={resolvingAddress}
+                                title="Send"
+                            />
+                            <Button
+                                onClick={sendCUSD}
+                                title="Confirm"
+                                disabled={
+                                    resolvedReceiverAddress.length === 0 ||
+                                    transferValue.length === 0 ||
+                                    Number(transferValue) == 0
+                                }
+                            />
+                        </div>
+                    </div>
                     <p className="text-center">
                         Issuer Address: {ISSUER_ADDRESS}
                     </p>

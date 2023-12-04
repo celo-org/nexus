@@ -9,7 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@celo/identity": "^5.0.4",
+        "@celo/identity": "^5.1.1",
         "@celo/rainbowkit-celo": "^1.0.1",
         "@headlessui/react": "^1.7.14",
         "@heroicons/react": "^2.0.18",
@@ -19,7 +19,7 @@
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-hot-toast": "^2.4.1",
-        "viem": "^0.3.30",
+        "viem": "^1.19.11",
         "wagmi": "^1.2"
     },
     "devDependencies": {
