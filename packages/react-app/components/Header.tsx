@@ -59,7 +59,7 @@ export default function Header() {
                                         href="#"
                                         className="inline-flex items-center border-b-2 border-black px-1 pt-1 text-sm font-medium text-gray-900"
                                     >
-                                        Home
+                                        Send cUSD
                                     </a>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@ export default function Header() {
                                 href="#"
                                 className="block border-l-4 border-black py-2 pl-3 pr-4 text-base font-medium text-black"
                             >
-                                Home
+                                Send cUSD
                             </Disclosure.Button>
                             {/* Add here your custom menu elements */}
                         </div>

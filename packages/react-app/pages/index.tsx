@@ -157,7 +157,7 @@ export default function Home() {
 
     return (
         <div className="w-screen flex flex-col justify-center items-center gap-y-4">
-            <p className="text-xl">Send cUSD to external users</p>
+            <p className="text-xl">Send cUSD</p>
             {isConnected ? (
                 <>
                     <input
