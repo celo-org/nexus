@@ -72,6 +72,7 @@ export class SocialConnectIssuer {
                     ONE_CENT_CUSD // TODO we should increase by more
                 )
             ).wait();
+
             const odisPaymentTxReceipt = (
                 await this.odisPaymentsContract.payInCUSD(
                     this.wallet.address,
@@ -86,7 +87,7 @@ export class SocialConnectIssuer {
         identifierType: IdentifierPrefix
     ) {
         try {
-            return this.getObfuscatedId(plaintextId, identifierType);
+            return await this.getObfuscatedId(plaintextId, identifierType);
         } catch {
             await this.checkAndTopUpODISQuota();
             return this.getObfuscatedId(plaintextId, identifierType);
@@ -147,16 +148,13 @@ export class SocialConnectIssuer {
         identifierType: IdentifierPrefix,
         issuerAddresses: string[]
     ) {
-        const obfuscatedId = await this.getObfuscatedId(
+        const obfuscatedId = await this.getObfuscatedIdWithQuotaRetry(
             plaintextId,
             identifierType
         );
         const attestations =
             await this.federatedAttestationsContract.lookupAttestations(
-                await this.getObfuscatedIdWithQuotaRetry(
-                    plaintextId,
-                    identifierType
-                ),
+                obfuscatedId,
                 issuerAddresses
             );
 

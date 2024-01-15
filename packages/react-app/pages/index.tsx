@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { encodeFunctionData, isAddress, parseEther, toHex } from "viem";
+import { encodeFunctionData, isAddress, parseEther } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import FederatedAttestationsAbi from "../abi/FederatedAttestation";
 import stableTokenAbi from "../abi/StableToken";
@@ -12,12 +12,25 @@ import Button from "@/components/Button";
 // const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
 const ISSUER_ADDRESS = "0x7888612486844Bb9BE598668081c59A9f7367FBc";
 
+export const E164_REGEX = /^\+[1-9][0-9]{1,14}$/;
+
+export function validatePhoneNumber(phoneNumber: string): boolean {
+    if (E164_REGEX.test(phoneNumber)) {
+        return true;
+    }
+    return false;
+}
+
 export default function Home() {
     const publicClient = usePublicClient();
     const { isConnected } = useAccount();
     const { data: walletClient } = useWalletClient();
 
     const [resolvingAddress, setResolvingAddress] = useState(false);
+
+    const [isValidAddress, setIsValidAddress] = useState(false);
+    const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(false);
+
     const [resolvedReceiverAddress, setResolvedReceiverAddress] = useState("");
     const [identifier, setIdentifier] = useState("");
 
@@ -132,14 +145,19 @@ export default function Home() {
         if (isAddress(target.value)) {
             setResolvedReceiverAddress(target.value);
             setIdentifier(target.value);
+            setIsValidAddress(true);
+            setIsValidPhoneNumber(false);
         } else {
             setIdentifier(target.value);
+            setResolvedReceiverAddress("");
+            setIsValidPhoneNumber(validatePhoneNumber(target.value));
+            setIsValidAddress(false);
         }
     }
 
     return (
         <div className="w-screen flex flex-col justify-center items-center gap-y-4">
-            <p className="text-xl">Send cUSD to external users</p>
+            <p className="text-xl">Send cUSD</p>
             {isConnected ? (
                 <>
                     <input
@@ -165,8 +183,12 @@ export default function Home() {
                         <div className="flex gap-x-2">
                             <Button
                                 onClick={lookupAddress}
-                                disabled={resolvingAddress}
-                                title="Send"
+                                disabled={
+                                    isValidAddress ||
+                                    !isValidPhoneNumber ||
+                                    resolvingAddress
+                                }
+                                title="Find"
                             />
                             <Button
                                 onClick={sendCUSD}
