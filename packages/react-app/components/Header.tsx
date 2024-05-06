@@ -56,10 +56,16 @@ export default function Header() {
                                 </div>
                                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                                     <a
-                                        href="#"
+                                        href="/"
                                         className="inline-flex items-center border-b-2 border-black px-1 pt-1 text-sm font-medium text-gray-900"
                                     >
                                         Send cUSD
+                                    </a>
+                                    <a
+                                        href="/noncusd"
+                                        className="inline-flex items-center border-black px-1 pt-1 text-sm font-medium text-gray-900"
+                                    >
+                                        nonCUSD
                                     </a>
                                 </div>
                             </div>
@@ -84,6 +90,13 @@ export default function Header() {
                                 className="block border-l-4 border-black py-2 pl-3 pr-4 text-base font-medium text-black"
                             >
                                 Send cUSD
+                            </Disclosure.Button>
+                            <Disclosure.Button
+                                as="a"
+                                href="/noncusd"
+                                className="block border-l-4 border-black py-2 pl-3 pr-4 text-base font-medium text-black"
+                            >
+                                nonCUSD
                             </Disclosure.Button>
                             {/* Add here your custom menu elements */}
                         </div>

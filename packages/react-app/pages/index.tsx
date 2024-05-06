@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { encodeFunctionData, isAddress, parseEther } from "viem";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import FederatedAttestationsAbi from "../abi/FederatedAttestation";
 import stableTokenAbi from "../abi/StableToken";
 import toast from "react-hot-toast";
 import type { LookupResponse } from "./api/socialconnect/lookup";
@@ -9,8 +8,8 @@ import { FA_PROXY_ADDRESS, STABLE_TOKEN_ADDRESS } from "@/utils/constants";
 import { celo, celoAlfajores } from "viem/chains";
 import Button from "@/components/Button";
 
-// const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
-const ISSUER_ADDRESS = "0x7888612486844Bb9BE598668081c59A9f7367FBc";
+const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
+// const ISSUER_ADDRESS = "0x7888612486844Bb9BE598668081c59A9f7367FBc";
 
 export const E164_REGEX = /^\+[1-9][0-9]{1,14}$/;
 
@@ -59,26 +58,16 @@ export default function Home() {
                 id: resolvingToast,
                 duration: 2000,
             });
-
-            console.error(lookupResponse.error);
         } else {
-            let { obfuscatedId } = lookupResponse;
+            let { accounts, obfuscatedId } = lookupResponse;
 
             try {
-                let resolvedAddress = (await publicClient.readContract({
-                    address: FA_PROXY_ADDRESS,
-                    abi: FederatedAttestationsAbi,
-                    functionName: "lookupAttestations",
-                    args: [obfuscatedId, [ISSUER_ADDRESS]],
-                })) as string[][];
-
-                if (resolvedAddress[1].length) {
+                if (accounts.length) {
                     toast.success("Address found", { id: resolvingToast });
+                    setResolvedReceiverAddress(accounts[0]);
                 } else {
                     toast.error("No address found", { id: resolvingToast });
                 }
-
-                setResolvedReceiverAddress(resolvedAddress[1][0]);
             } catch (error: any) {
                 if ("message" in error) {
                     toast.error(error.message, {
@@ -89,6 +78,7 @@ export default function Home() {
                 }
             } finally {
                 setResolvingAddress(false);
+                setIdentifier("");
             }
         }
     }

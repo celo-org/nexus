@@ -65,7 +65,8 @@ export default async function lookup(
                  * But SocialConnect allows looking up under other issuers just need their address.
                  */
                 let issuerAddresses = [
-                    "0x7888612486844Bb9BE598668081c59A9f7367FBc",
+                    // "0x7888612486844Bb9BE598668081c59A9f7367FBc",
+                    "0xDF7d8B197EB130cF68809730b0D41999A830c4d7",
                 ];
 
                 let lookupResponse: LookupResponse = await issuer.lookup(
