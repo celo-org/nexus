@@ -20,7 +20,7 @@ export default async function register(
     switch (req.method) {
         case "POST":
             try {
-                let { identifier, account } = JSON.parse(req.body);
+                let { identifier, account } = req.body;
 
                 let wallet = new Wallet(
                     process.env.ISSUER_PRIVATE_KEY as string,

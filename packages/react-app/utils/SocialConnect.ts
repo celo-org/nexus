@@ -73,12 +73,16 @@ export class SocialConnectIssuer {
                 )
             ).wait();
 
+            console.log(approvalTxReceipt);
+
             const odisPaymentTxReceipt = (
                 await this.odisPaymentsContract.payInCUSD(
                     this.wallet.address,
                     ONE_CENT_CUSD // TODO we should increase by more
                 )
             ).wait();
+
+            console.log(odisPaymentTxReceipt);
         }
     }
 
@@ -152,12 +156,13 @@ export class SocialConnectIssuer {
             plaintextId,
             identifierType
         );
+        console.log(obfuscatedId);
         const attestations =
             await this.federatedAttestationsContract.lookupAttestations(
                 obfuscatedId,
                 issuerAddresses
             );
-
+        console.log(attestations);
         return {
             accounts: attestations.accounts as string[], // TODO typesafety
             obfuscatedId,
