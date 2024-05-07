@@ -1,203 +1,141 @@
-import { useState } from "react";
-import { encodeFunctionData, isAddress, parseEther } from "viem";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import stableTokenAbi from "../abi/StableToken";
+import { useEffect, useState } from "react";
+import { useAccount, useChainId } from "wagmi";
 import toast from "react-hot-toast";
-import type { LookupResponse } from "./api/socialconnect/lookup";
-import { FA_PROXY_ADDRESS, STABLE_TOKEN_ADDRESS } from "@/utils/constants";
-import { celo, celoAlfajores } from "viem/chains";
-import Button from "@/components/Button";
+import { Button } from "@chakra-ui/react";
+import useSendErc20 from "@/hooks/useSendErc20";
+import { Address } from "viem";
 
-const ISSUER_ADDRESS = "0xDF7d8B197EB130cF68809730b0D41999A830c4d7";
-// const ISSUER_ADDRESS = "0x7888612486844Bb9BE598668081c59A9f7367FBc";
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT as
+  | "MAINNET"
+  | "TESTNET";
+
+const tokens: {
+  42220: { [k: string]: { tokenAddress: Address; tokenDecimals: number } };
+  44787: { [k: string]: { tokenAddress: Address; tokenDecimals: number } };
+} = {
+  42220: {
+    cUSD: {
+      tokenAddress: "0x765DE816845861e75A25fCA122bb6898B8B1282a",
+      tokenDecimals: 18,
+    },
+    USDC: {
+      tokenAddress: "0xcebA9300f2b948710d2653dD7B07f33A8B32118C",
+      tokenDecimals: 6,
+    },
+    USDT: {
+      tokenAddress: "0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e",
+      tokenDecimals: 6,
+    },
+  },
+  44787: {
+    cUSD: {
+      tokenAddress: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1",
+      tokenDecimals: 18,
+    },
+    USDC: {
+      tokenAddress: "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B",
+      tokenDecimals: 6,
+    },
+    // USDT: "",
+  },
+};
 
 export const E164_REGEX = /^\+[1-9][0-9]{1,14}$/;
 
 export function validatePhoneNumber(phoneNumber: string): boolean {
-    if (E164_REGEX.test(phoneNumber)) {
-        return true;
-    }
-    return false;
+  if (E164_REGEX.test(phoneNumber)) {
+    return true;
+  }
+  return false;
 }
 
 export default function Home() {
-    const publicClient = usePublicClient();
-    const { isConnected } = useAccount();
-    const { data: walletClient } = useWalletClient();
+  const { isConnected } = useAccount();
+  const sendErc20 = useSendErc20();
+  const chainId = useChainId() as 42220 | 44787;
 
-    const [resolvingAddress, setResolvingAddress] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-    const [isValidAddress, setIsValidAddress] = useState(false);
-    const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-    const [resolvedReceiverAddress, setResolvedReceiverAddress] = useState("");
-    const [identifier, setIdentifier] = useState("");
+  if (!isMounted) return null;
 
-    const [transferValue, setTransferValue] = useState("");
-
-    async function lookupAddress() {
-        setResolvingAddress(true);
-
-        let resolvingToast = toast.loading("Looking up address", {
-            duration: 6000,
-        });
-
-        let response: Response = await fetch(
-            `/api/socialconnect/lookup?${new URLSearchParams({
-                handle: identifier,
-            })}`,
-            {
-                method: "GET",
-            }
-        );
-
-        let lookupResponse: LookupResponse = await response.json();
-
-        if ("error" in lookupResponse) {
-            toast.error(lookupResponse.error, {
-                id: resolvingToast,
-                duration: 2000,
-            });
-        } else {
-            let { accounts, obfuscatedId } = lookupResponse;
-
-            try {
-                if (accounts.length) {
-                    toast.success("Address found", { id: resolvingToast });
-                    setResolvedReceiverAddress(accounts[0]);
-                } else {
-                    toast.error("No address found", { id: resolvingToast });
-                }
-            } catch (error: any) {
-                if ("message" in error) {
-                    toast.error(error.message, {
-                        id: resolvingToast,
-                        duration: 2000,
-                    });
-                    console.error(error.message);
-                }
-            } finally {
-                setResolvingAddress(false);
-                setIdentifier("");
-            }
-        }
+  async function sendToken({
+    tokenAddress,
+    tokenDecimals,
+  }: {
+    tokenAddress: Address;
+    tokenDecimals: number;
+  }) {
+    try {
+      await sendErc20(
+        tokenAddress,
+        "0x22ae7Cf4cD59773f058B685a7e6B7E0984C54966",
+        "1",
+        tokenDecimals
+      );
+    } catch (error: any) {
+      toast.error("Something went wrong", { duration: 2000 });
     }
+  }
 
-    async function sendCUSD() {
-        // Refactor for window.ethereum can't use walletClient
-        try {
-            let hash = await walletClient?.sendTransaction({
-                to: STABLE_TOKEN_ADDRESS,
-                data: encodeFunctionData({
-                    abi: stableTokenAbi,
-                    functionName: "transfer",
-                    args: [
-                        resolvedReceiverAddress,
-                        parseEther(`${Number(transferValue)}`),
-                    ],
-                }),
-                chain:
-                    process.env.NEXT_PUBLIC_ENVIRONMENT == "TESTNET"
-                        ? celoAlfajores
-                        : celo,
-            });
-
-            let txToast = toast.loading(
-                "Transaction sent waiting for confirmation",
-                {
-                    duration: 6000,
-                }
-            );
-            if (hash) {
-                const transaction =
-                    await publicClient.waitForTransactionReceipt({
-                        hash,
-                    });
-
-                if (transaction.status === "success") {
-                    toast.success("Transaction successful", {
-                        id: txToast,
-                        duration: 2000,
-                    });
-                } else {
-                    toast.error("Something went wrong", {
-                        id: txToast,
-                        duration: 2000,
-                    });
-                }
+  return (
+    <div className="w-screen flex flex-col justify-center items-center gap-y-4">
+      {isConnected ? (
+        <div className="flex flex-col md:flex-row text-center gap-4 items-center">
+          <Button
+            textColor={"white"}
+            onClick={() => sendToken(tokens[chainId]["cUSD"])}
+            bg={"#46CD85"}
+            _hover={{ bg: "#46CD85" }}
+            _active={{ bg: "#46CD85" }}
+            leftIcon={
+              <img
+                className="h-[20px] w-[20px]"
+                src="https://s2.coinmarketcap.com/static/img/coins/64x64/7236.png"
+              />
             }
-        } catch (error: any) {
-            toast.error("Something went wrong", { duration: 2000 });
-        }
-    }
-
-    async function handleIdentifierChange({ target }: any) {
-        if (isAddress(target.value)) {
-            setResolvedReceiverAddress(target.value);
-            setIdentifier(target.value);
-            setIsValidAddress(true);
-            setIsValidPhoneNumber(false);
-        } else {
-            setIdentifier(target.value);
-            setResolvedReceiverAddress("");
-            setIsValidPhoneNumber(validatePhoneNumber(target.value));
-            setIsValidAddress(false);
-        }
-    }
-
-    return (
-        <div className="w-screen flex flex-col justify-center items-center gap-y-4">
-            <p className="text-xl">Send cUSD</p>
-            {isConnected ? (
-                <>
-                    <input
-                        className="text-[48px] bg-gypsum outline-none text-center"
-                        type="number"
-                        value={transferValue}
-                        onChange={({ target }) =>
-                            setTransferValue(target.value)
-                        }
-                        placeholder="0"
-                    />
-                    <p className="font-bold">cUSD</p>
-                    <div className="flex items-center gap-x-4">
-                        <span>To:</span>
-                        <input
-                            value={identifier}
-                            onChange={(e) => handleIdentifierChange(e)}
-                            className="text-[16px] w-[250px] bg-gypsum border-b-2 outline-none"
-                        />
-                    </div>
-                    <div className="flex text-center flex-col gap-y-4 items-center">
-                        <p>Resolved Address: {resolvedReceiverAddress}</p>
-                        <div className="flex gap-x-2">
-                            <Button
-                                onClick={lookupAddress}
-                                disabled={
-                                    isValidAddress ||
-                                    !isValidPhoneNumber ||
-                                    resolvingAddress
-                                }
-                                title="Find"
-                            />
-                            <Button
-                                onClick={sendCUSD}
-                                title="Confirm"
-                                disabled={
-                                    resolvedReceiverAddress.length === 0 ||
-                                    transferValue.length === 0 ||
-                                    Number(transferValue) == 0
-                                }
-                            />
-                        </div>
-                    </div>
-                    <p className="text-center">
-                        Issuer Address: {ISSUER_ADDRESS}
-                    </p>
-                </>
-            ) : (
-                <p>Please connect wallet first</p>
-            )}
+          >
+            Send 1 cUSD
+          </Button>
+          <Button
+            textColor={"white"}
+            onClick={() => sendToken(tokens[chainId]["USDC"])}
+            bg={"#2775CA"}
+            _hover={{ bg: "#2775CA" }}
+            _active={{ bg: "#2775CA" }}
+            leftIcon={
+              <img
+                className="h-[20px] w-[20px]"
+                src="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png"
+              />
+            }
+          >
+            Send 1 USDC
+          </Button>
+          {chainId === 42220 && (
+            <Button
+              textColor={"white"}
+              onClick={() => sendToken(tokens[chainId]["USDT"])}
+              bg={"#009393"}
+              _hover={{ bg: "#009393" }}
+              _active={{ bg: "#009393" }}
+              leftIcon={
+                <img
+                  className="h-[20px] w-[20px]"
+                  src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png"
+                />
+              }
+            >
+              Send 1 USDT
+            </Button>
+          )}
         </div>
-    );
+      ) : (
+        <p>Please connect wallet first</p>
+      )}
+    </div>
+  );
 }
