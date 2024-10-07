@@ -58,6 +58,7 @@ export default function Home() {
   const publicClient = usePublicClient();
   const [transactionHash, setTransactionHash] = useState<Hex | null>(null);
   const [tokenAmount, setTokenAmount] = useState("0");
+  const [receiverAddress, setReceiverAddress] = useState("0x000...");
 
   useEffect(() => {
     setIsMounted(true);
@@ -82,7 +83,7 @@ export default function Home() {
 
       const hash = await sendErc20(
         tokenAddress,
-        "0x22ae7Cf4cD59773f058B685a7e6B7E0984C54966",
+        receiverAddress,
         tokenAmount,
         tokenDecimals
       );
@@ -124,6 +125,10 @@ export default function Home() {
     setTokenAmount(target.value);
   }
 
+  function handleReceiverChange({ target }: any) {
+    setReceiverAddress(target.value);
+  }
+
   return (
     <div className="w-screen flex flex-col justify-center items-center gap-y-4">
       {isConnected ? (
@@ -132,6 +137,11 @@ export default function Home() {
             <div className="flex flex-col space-y-4">
               <p>Send Custom cUSD Amount</p>
               <div className="flex space-x-4">
+                <input
+                  value={receiverAddress}
+                  onChange={handleReceiverChange}
+                  className="border-2 px-4 border-black"
+                />
                 <input
                   value={tokenAmount}
                   onChange={handleValueChange}
@@ -149,7 +159,7 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <div className="flex flex-col md:flex-row gap-4 items-center">
+            {/* <div className="flex flex-col md:flex-row gap-4 items-center">
               <Button
                 textColor={"white"}
                 onClick={() => sendToken(tokens[chainId]["cUSD"])}
@@ -197,7 +207,7 @@ export default function Home() {
                   Send 1 USDT
                 </Button>
               )}
-            </div>
+            </div> */}
           </div>
           {transactionHash ? (
             <div>
