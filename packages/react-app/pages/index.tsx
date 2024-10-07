@@ -149,7 +149,6 @@ export default function Home() {
                 />
                 <Button
                   bg={"#000000"}
-                  _active={"#000"}
                   textColor={"white"}
                   onClick={() =>
                     sendToken({ ...tokens[chainId]["cUSD"], tokenAmount })
