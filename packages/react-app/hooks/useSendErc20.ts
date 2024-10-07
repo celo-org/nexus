@@ -1,14 +1,12 @@
 import { useCallback } from "react";
 import { encodeFunctionData, parseUnits } from "viem";
-import { usePublicClient, useWalletClient } from "wagmi";
-import toast from "react-hot-toast";
+import { useWalletClient } from "wagmi";
 import stableTokenAbi from "../abi/StableToken";
 import { celo, celoAlfajores } from "viem/chains";
+import { STABLE_TOKEN_ADDRESS, USDC_ADAPTER_ADDRESS } from "@/utils/constants";
 
 export default function useSendErc20() {
   const { data: walletClient } = useWalletClient();
-
-  const publicClient = usePublicClient();
 
   const sendErc20 = useCallback(
     async function (
@@ -17,6 +15,7 @@ export default function useSendErc20() {
       transferValue: string,
       tokenDecimals: number
     ) {
+      console.log("Transfer Value", transferValue);
       let hash = await walletClient?.sendTransaction({
         to: tokenAddress,
         data: encodeFunctionData({
@@ -28,36 +27,13 @@ export default function useSendErc20() {
             parseUnits(`${Number(transferValue)}`, tokenDecimals),
           ],
         }),
-        // If the wallet is connected to a different network then you get an error.
-        chain: celoAlfajores,
-        // chain: celo,
       });
-      console.log(tokenAddress);
 
-      if (publicClient && hash) {
-        let txToast = toast.loading(
-          "Transaction sent waiting for confirmation",
-          {
-            duration: 6000,
-          }
-        );
-
-        const transaction = await publicClient.waitForTransactionReceipt({
-          hash,
-        });
-
-        if (transaction.status === "success") {
-          toast.success("Transaction successful", {
-            id: txToast,
-            duration: 2000,
-          });
-        } else {
-          toast.error("Something went wrong", {
-            id: txToast,
-            duration: 2000,
-          });
-        }
+      if (hash) {
+        return hash;
       }
+
+      return null;
     },
     [walletClient]
   );
